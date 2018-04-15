@@ -65,7 +65,7 @@ class App extends React.Component {
         <Route component={DetailedList} path='/names'/>
         <Route component={Game} path='/ttt'/>
         <Route component={() => { return <Counter store={this.props.store} onIncrement={this.props.onIncrement} onDecrement={this.props.onDecrement} />}} path='/counter' />
-        <Route component={TodoApp} path={'/todo'} />
+        <Route component={() => { return <TodoApp todos={todoStore.getState().todos} visibilityFilter={todoStore.getState().visibilityFilter} />}} path={'/todo'} />
       </div>
     );
   }
