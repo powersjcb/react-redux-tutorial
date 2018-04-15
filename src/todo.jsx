@@ -97,7 +97,6 @@ class FilterLink extends React.Component {
     this.unsubscribe()
   }
 
-
   render() {
     return (
       <OptionalLink
@@ -118,7 +117,7 @@ class FilterLink extends React.Component {
   }
 }
 
-const displayFilter = (todos, filter) => {
+const filterTodos = (todos, filter) => {
   return todos.filter(todo => {
     switch (filter) {
       case 'SHOW_ALL':
@@ -154,8 +153,44 @@ const TodoList = ({todos, onTodoClick}) => (
   </ul>
 )
 
-const AddTodo = ({onAddClick}) => {
+class VisibleTodoList extends React.Component {
+  componentDidMount() {
+    this.unsubscribe = store.subscribe(() => {
+      this.forceUpdate()
+    })
+  }
+  componentWillUnmount() {
+    this.unsubscribe()
+  }
+  render() {
+    const state = store.getState()
+    return (
+      <TodoList
+        todos={filterTodos(
+          state.todos,
+          state.visibilityFilter
+        )}
+        onTodoClick={id => {
+          store.dispatch({
+            type: 'TOGGLE_TODO',
+            id: id
+          })
+        }}
+      />
+    )
+  }
+}
+
+const AddTodo = () => {
   let input
+  const onAddClick = (text) => {
+    store.dispatch({
+      type: 'ADD_TODO',
+      id: nextTodoId++,
+      text
+    })
+  }
+
   return (
     <div>
       <input ref={node => {input = node}} type="text" />
@@ -186,33 +221,14 @@ const Footer = () => (
 )
 
 let nextTodoId = 0
-const TodoApp = ({todos, visibilityFilter}) => {
-  return (
-    <div>
-      <h1>Todo app</h1>
-      <AddTodo
-        onAddClick={(text) => {
-          store.dispatch({
-            type: 'ADD_TODO',
-            id: nextTodoId++,
-            text
-          })
-        }}/>
-      <TodoList
-        todos={displayFilter(
-          todos,
-          visibilityFilter
-        )}
-        onTodoClick={(id) => {
-          store.dispatch({
-            type: 'TOGGLE_TODO',
-            id
-          })
-        }}/>
-      <Footer/>
-    </div>
-  )
-}
+const TodoApp = () => (
+  <div>
+    <h1>Todo app</h1>
+    <AddTodo/>
+    <VisibleTodoList/>
+    <Footer/>
+  </div>
+)
 
 const testAddTodo = () => {
   const stateBefore = []
