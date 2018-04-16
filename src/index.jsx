@@ -1,13 +1,16 @@
+import "./index.css"
+import './immutability.jsx'
 import PropTypes from 'prop-types'
 import React from "react"
 import ReactDOM from "react-dom"
+import { Provider } from 'react-redux'
 import { BrowserRouter, Link, Route } from 'react-router-dom'
-import './immutability.jsx'
+import { Game } from './ttt.jsx'
 import { TodoApp, todoStore } from './todo.jsx'
 
-import "./index.css"
+// import and run tests
+import './test_todo.js'
 
-import { Game } from './ttt.jsx'
 
 class DetailedList extends React.Component {
   static defaultProps = {
@@ -20,7 +23,6 @@ class DetailedList extends React.Component {
       items: []
     }
   }
-
 
   componentDidMount() {
     fetch(this.props.api_url)
@@ -65,7 +67,13 @@ class App extends React.Component {
         <Route component={DetailedList} path='/names'/>
         <Route component={Game} path='/ttt'/>
         <Route component={() => { return <Counter store={this.props.store} onIncrement={this.props.onIncrement} onDecrement={this.props.onDecrement} />}} path='/counter' />
-        <Route component={TodoApp} path={'/todo'} />
+        <Route component={() => {
+          return (
+            <Provider store={todoStore}>
+              <TodoApp />
+            </Provider>
+          )
+        }} path={'/todo'} />
       </div>
     );
   }
